@@ -3,21 +3,7 @@ node_js:
   - 11
 env:
  - IMAGE_NAME=341526889944.dkr.ecr.eu-west-1.amazonaws.com/juiceshop:1.0-$TRAVIS_B$
-stages:
-  - lint
-  - test
-  - integration
-  - e2e
-  - deploy
-branches:
-  except:
-    - gh-pages
-    - l10n_develop
-addons:
-  chrome: stable
-  code_climate:
-    repo_token:
-      secure: NC3ew4c92DO4SAdbJvaZkaRnEZaZcAr9NcxOeraqAKHRXY3COnerWGR8+kIE9KiadcRdatmu0sSjWldDcAZfmMwOraMI9CDkqdPSjtjciCVEFdGi+OPOvMY/gOJU6XeM7lsO5MvYD7mqChl2gR6s7IO/klPahf53c97PPDo3C90=
+
 install: if [ -z "$TRAVIS_TAG" ]; then npm install; fi
 script: if [ -z "$TRAVIS_TAG" ]; then NODE_ENV=test npm test; fi
 before_deploy:
@@ -25,41 +11,11 @@ before_deploy:
   - rm -rf frontend/node_modules
   - npm install --production
   - npm run package
-deploy:
-  - pip install --user awscli
-  - eval $(aws ecr get-login --region eu-west-1 --no-include-email)
-  - docker build -t 3r1co/nodetest .
-  - docker tag 3r1co/nodetest $IMAGE_NAME
-  - docker push $IMAGE_NAME
 
 jobs:
-  include:
-    - stage: lint
-      if: tag IS blank
-      install: npm i -g standard && cd frontend && npm install && cd ..
-      script: npm run lint
-    - stage: integration
-      if: tag IS blank
-      script:
-        - export NODE_ENV=test
-        - npm test
-        - npm run frisby
-      after_success:
-        - "./node_modules/.bin/lcov-result-merger 'build/reports/coverage/**/lcov.info' 'build/reports/coverage/lcov_merged.info'"
-        - "./node_modules/.bin/codeclimate-test-reporter < ./build/reports/coverage/lcov_merged.info"
-    - stage: e2e
-      if: tag IS blank
-      script:
-        - export NODE_ENV=test
-        - npm run protractor
-    - stage: deploy
-      if: (branch = master OR branch = develop OR branch = facelift) AND NOT type = pull_request
-      node_js: 11
-      install: skip
-      script: skip
-      deploy:
-        - pip install --user awscli
-        - eval $(aws ecr get-login --region eu-west-1 --no-include-email)
-        - docker build -t 3r1co/nodetest .
-        - docker tag 3r1co/nodetest $IMAGE_NAME
-        - docker push $IMAGE_NAME
+    after_success:
+      - pip install --user awscli
+      - eval $(aws ecr get-login --region eu-west-1 --no-include-email)
+      - docker build -t 3r1co/nodetest .
+      - docker tag 3r1co/nodetest $IMAGE_NAME
+      - docker push $IMAGE_NAME
