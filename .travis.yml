@@ -1,8 +1,9 @@
 language: node_js
 node_js:
-  - 10
-  - 8
   - 11
+env:
+ - IMAGE_NAME=341526889944.dkr.ecr.eu-west-1.amazonaws.com/juiceshop:1.0-$TRAVIS_B$
+
 stages:
   - lint
   - test
@@ -26,18 +27,12 @@ before_deploy:
   - npm install --production
   - npm run package
 deploy:
-  - provider: releases
-    overwrite: true
-    api_key:
-      secure: fHybcH65ZdS5ITVKH2tIVBITVSiRQJ1AuWqLP16gyAz5pdmWbLM5gA/74zCozanRmuB+7pGFbhDNm075JWoEDVrWSFDLnNiXvfgUYa4oVEiWZlLvOfSARaU3AQPlVvFVhIbG9SA5IEwTtNFbyHjqLjGn/DSBpiIDqqxhF57vw7Q=
-    file: dist/*
-    skip_cleanup: true
-    file_glob: true
-    draft: true
-    tag_name: "$TRAVIS_TAG"
-    on:
-      repo: bkimminich/juice-shop
-      tags: true
+  - pip install --user awscli
+  - eval $(aws ecr get-login --region eu-west-1 --no-include-email)
+  - docker build -t 3r1co/nodetest .
+  - docker tag 3r1co/nodetest $IMAGE_NAME
+  - docker push $IMAGE_NAME
+
 jobs:
   include:
     - stage: lint
@@ -64,26 +59,8 @@ jobs:
       install: skip
       script: skip
       deploy:
-        - provider: heroku
-          api_key:
-            secure: faVT3Ne/O7lVo0+pTm6RcXss0ivvSoODaxMkiVwdpk/51/EsRd4+/Gjmp3RGPmW5H5luOephsI8uFMMhgKiu5i3NV58ZSx29Z0aby+bfIhesZGZqJQvxeW8B0J8vlQFnEHP6xc6SAlXSdNjNpDeBaV7WSFSGKGp4Nh5QyO2ySLI=
-          app:
-            master: juice-shop
-            develop: juice-shop-staging
-            facelift: juice-shop-experimental
-          on:
-            repo: bkimminich/juice-shop
-notifications:
-  webhooks:
-    urls:
-      - secure: QZ3/2h7hThg527PX1z7kTTRGL5jEbTTHRbetYHt8Gzgdhvtruq4cjxMQZdUcmxKlncAhoB976iFl/Ja9EpExgrXnt/Tj0Aft6JDc7g8y0kuD/SiQpFT7d46R7vOTJeFHyMzfQN9M/h81DXrG+VO5OPGR/QYNa39kMzkTc86tt1E=
-    on_success: always
-    on_failure: always
-    on_start: never
-  slack:
-    rooms:
-      secure: jis/Fcasy+4QCqg6SZnf1XxXTNFrQENutYCN4QuMUQbfiD6QsLxTQS5o0MZ8e9EYTdptUXmjjgkaEulxO5fIUtmDcOrKcPxToDMjyCZEglfEf9CzRVRap7LnZwoCZ5yet/0E68qt4QhfTgfwYc9QIfSZo45rdyNS6BXI2vomGqE=
-    on_success: change
-    on_failure: change
-    on_start: never
-    on_pull_requests: false
+        - pip install --user awscli
+        - eval $(aws ecr get-login --region eu-west-1 --no-include-email)
+        - docker build -t 3r1co/nodetest .
+        - docker tag 3r1co/nodetest $IMAGE_NAME
+        - docker push $IMAGE_NAME
