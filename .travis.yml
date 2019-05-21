@@ -2,7 +2,7 @@ language: node_js
 node_js:
   - 10
 env:
- - IMAGE_NAME=341526889944.dkr.ecr.eu-west-1.amazonaws.com/juiceshop:1.0-$TRAVIS_B$
+ - IMAGE_NAME=341526889944.dkr.ecr.eu-west-1.amazonaws.com/juiceshop:1.0-$TRAVIS_BUILD_NUMBER
 
 install: if [ -z "$TRAVIS_TAG" ]; then npm install; fi
 script: if [ -z "$TRAVIS_TAG" ]; then NODE_ENV=test npm test; fi
