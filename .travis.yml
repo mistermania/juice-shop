@@ -12,10 +12,9 @@ before_deploy:
   - npm install --production
   - npm run package
 
-jobs:
-    after_success:
-      - pip install --user awscli
-      - eval $(aws ecr get-login --region eu-west-1 --no-include-email)
-      - docker build -t 3r1co/nodetest .
-      - docker tag 3r1co/nodetest $IMAGE_NAME
-      - docker push $IMAGE_NAME
+after_success:
+  - pip install --user awscli
+  - eval $(aws ecr get-login --region eu-west-1 --no-include-email)
+  - docker build -t 3r1co/nodetest .
+  - docker tag 3r1co/nodetest $IMAGE_NAME
+  - docker push $IMAGE_NAME
