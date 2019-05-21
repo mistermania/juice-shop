@@ -1,6 +1,6 @@
 language: node_js
 node_js:
-  - 10
+  - 11
 env:
  - IMAGE_NAME=341526889944.dkr.ecr.eu-west-1.amazonaws.com/juiceshop:1.0-$TRAVIS_BUILD_NUMBER
 
@@ -18,3 +18,5 @@ after_success:
   - docker build -t 3r1co/nodetest .
   - docker tag 3r1co/nodetest $IMAGE_NAME
   - docker push $IMAGE_NAME
+  - aws cloudformation deploy --template-file ./ecs-task.yaml --stack-name ecs-deployment --region eu-west-1 --parameter-override ImageName=$IMAGE_NAME
+  - aws cloudformation update-stack --template-body file://./ecs-task.yaml --stack-name ecs-deployment --region eu-west-1 --parameters "ParameterKey=ImageName,ParameterValue=$IMAGE_NAME"
