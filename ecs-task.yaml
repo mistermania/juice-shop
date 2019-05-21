@@ -24,7 +24,7 @@ Resources:
   WebApp: 
     Type: AWS::ECS::Service
     Properties: 
-      Cluster: "ecscluster"
+      Cluster: "yaniscluster"
       DesiredCount: 1
       TaskDefinition: 
         Ref: "taskdefinition"
