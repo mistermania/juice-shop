@@ -5,8 +5,8 @@ dist: trusty
 env:
  - IMAGE_NAME=341526889944.dkr.ecr.eu-west-1.amazonaws.com/juiceshop:1.0-$TRAVIS_BUILD_NUMBER
 
-install: if [ -z "$TRAVIS_TAG" ]; then npm install; fi
-script: if [ -z "$TRAVIS_TAG" ]; then NODE_ENV=test npm test; fi
+#install: if [ -z "$TRAVIS_TAG" ]; then npm install; fi
+#script: if [ -z "$TRAVIS_TAG" ]; then NODE_ENV=test npm test; fi
 before_deploy:
   - rm -rf node_modules
   - rm -rf frontend/node_modules
@@ -25,9 +25,9 @@ addons:
 after_success:
   - pip install --user awscli
   - eval $(aws ecr get-login --region eu-west-1 --no-include-email)
-  - docker build -t 3r1co/nodetest .
-  - docker tag 3r1co/nodetest $IMAGE_NAME
-  - docker push $IMAGE_NAME
-  - aws cloudformation deploy --template-file ./ecs-task.yaml --stack-name ecs-deployment --region eu-west-1 --parameter-override ImageName=$IMAGE_NAME
-  - aws cloudformation update-stack --template-body file://./ecs-task.yaml --stack-name ecs-deployment --region eu-west-1 --parameters "ParameterKey=ImageName,ParameterValue=$IMAGE_NAME"
-  - sonar-scanner -Dsonar.projectKey=mistermania_juice-shop -Dsonar.organization=mistermania-github -Dsonar.sources=. -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=df2cb62fc5792eb831485b37f0b93948071ac446 -Dsonar.javascript.lcov.reportPaths=./build/reports/coverage/server-tests/lcov.info,./build/reports/coverage/api-tests
+ # - docker build -t 3r1co/nodetest .
+ # - docker tag 3r1co/nodetest $IMAGE_NAME
+ # - docker push $IMAGE_NAME
+ # - aws cloudformation deploy --template-file ./ecs-task.yaml --stack-name ecs-deployment --region eu-west-1 --parameter-override ImageName=$IMAGE_NAME
+ # - aws cloudformation update-stack --template-body file://./ecs-task.yaml --stack-name ecs-deployment --region eu-west-1 --parameters "ParameterKey=ImageName,ParameterValue=$IMAGE_NAME"
+ # - sonar-scanner -Dsonar.projectKey=mistermania_juice-shop -Dsonar.organization=mistermania-github -Dsonar.sources=. -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=df2cb62fc5792eb831485b37f0b93948071ac446 -Dsonar.javascript.lcov.reportPaths=./build/reports/coverage/server-tests/lcov.info,./build/reports/coverage/api-tests
