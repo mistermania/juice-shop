@@ -12,11 +12,16 @@ before_deploy:
   - rm -rf frontend/node_modules
   - npm install --production
   - npm run package
+  - wget https://bintray.com/jeremy-long/owasp/download_file?file_path=dependency-check-5.0.0-M3-release.zip
+  - unzip download_file?file_path=dependency-check-5.0.0-M3-release.zip
+  - sh ./dependency-check/bin/dependency-check.sh
 addons:
   sonarcloud:
     organization: "mistermania-github" # the key of the org you chose at step #3
     token:
       secure: "b7c3948ac08daa505110503fc8240b55a684544b" # encrypted value of your token
+  artifacts:
+    s3_region: "eu-west-1"
 after_success:
   - pip install --user awscli
   - eval $(aws ecr get-login --region eu-west-1 --no-include-email)
