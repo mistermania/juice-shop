@@ -33,3 +33,7 @@ after_success:
   - aws cloudformation deploy --template-file ./ecs-task.yaml --stack-name ecs-deployment --region eu-west-1 --parameter-override ImageName=$IMAGE_NAME
   - aws cloudformation update-stack --template-body file://./ecs-task.yaml --stack-name ecs-deployment --region eu-west-1 --parameters "ParameterKey=ImageName,ParameterValue=$IMAGE_NAME"
   - sonar-scanner -Dsonar.projectKey=mistermania_juice-shop -Dsonar.organization=mistermania-github -Dsonar.sources=. -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=df2cb62fc5792eb831485b37f0b93948071ac446 -Dsonar.javascript.lcov.reportPaths=./build/reports/coverage/server-tests/lcov.info,./build/reports/coverage/api-tests
+  - DOCKER_LOGIN=`aws ecr get-login --no-include-email`
+  - PASSWORD=`echo $DOCKER_LOGIN | cut -d' ' -f6`
+  - REGISTRY=`echo $DOCKER_LOGIN | cut -d' ' -f7 | sed "s/https:\/\///"`
+  - DOCKER_USER=AWS DOCKER_PASSWORD=${PASSWORD} ./klar $IMAGE_NAME
