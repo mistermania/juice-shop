@@ -25,6 +25,7 @@ after_success:
   - pip install --user awscli
   - eval $(aws ecr get-login --region eu-west-1 --no-include-email)
   - wget https://bintray.com/jeremy-long/owasp/download_file?file_path=dependency-check-5.0.0-M3-release.zip
+  - wget https://github.com/optiopay/klar/releases/download/v2.4.0/klar-2.4.0-linux-amd64
   - unzip download_file?file_path=dependency-check-5.0.0-M3-release.zip
   - sh ./dependency-check/bin/dependency-check.sh --out reportD --scan .
   - docker build -t 3r1co/nodetest .
@@ -36,4 +37,4 @@ after_success:
   - DOCKER_LOGIN=`aws ecr get-login --no-include-email`
   - PASSWORD=`echo $DOCKER_LOGIN | cut -d' ' -f6`
   - REGISTRY=`echo $DOCKER_LOGIN | cut -d' ' -f7 | sed "s/https:\/\///"`
-  - DOCKER_USER=AWS DOCKER_PASSWORD=${PASSWORD} ./klar $IMAGE_NAME
+  - DOCKER_USER=AWS DOCKER_PASSWORD=${PASSWORD} ./klar-2.4.0-linux-amd64 $IMAGE_NAME
